@@ -1,0 +1,840 @@
+\documentclass[12pt]{article}
+
+%paquete
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor} % Para colores
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{float} % PARA MEJORAR LA TABLA [h]
+% Definir lenguaje Rust
+\lstdefinelanguage{Rust}{
+	keywords={fn, let, mut, if, else, match, loop, for, in, while, break, continue, return,
+		struct, enum, impl, trait, pub, use, mod, crate, super, self, Self, const, static},
+	keywordstyle=\color{blue}\bfseries,
+	sensitive=true,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{gray!70}\ttfamily,
+	stringstyle=\color{orange},
+	morestring=[b]",
+}
+
+% Estilo para los listados
+\lstdefinestyle{ruststyle}{
+	language=Rust,
+	backgroundcolor=\color{gray!10},   % Fondo gris claro
+	frame=single,                      % Marco alrededor
+	rulecolor=\color{gray!60},         % Color del marco
+	numbers=left,                      % Números de línea
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	numbersep=8pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	breaklines=true,
+	breakatwhitespace=true,
+	basicstyle=\ttfamily\small,        % Tipo de letra
+	captionpos=b
+}
+
+
+\title{Documentacion rapida RUST}
+\author{Arekkasu}
+\date{\today}
+
+
+\begin{document}
+	\begin{titlepage}
+	\centering
+	\vspace*{3cm}
+
+	{\Huge\bfseries Documentación rápida de Rust \par}
+	\vspace{1.5cm}
+
+	{\LARGE Arekkasu\par}
+	\vspace{1cm}
+
+	{\large 10 de junio de 2025\par}
+	\vfill
+	\end{titlepage}
+	\newpage
+	\tableofcontents
+	\newpage
+	\setstretch{1.5}
+
+\section{Introducción}
+El presente documento tiene como objetivo ofrecer una comprensión rápida y personal del lenguaje de programación Rust. Está dirigido a personas con conocimientos previos en programación que deseen conocer las principales características y ventajas de Rust, desde su sintaxis básica hasta sus conceptos más destacados, como la seguridad en la gestión de memoria y el sistema de propiedad.
+
+A lo largo de este documento, se describirán los conceptos tal como los he interpretado. La idea es construir una base sólida que permita comenzar a trabajar con Rust de manera práctica y consciente.
+
+\newpage
+\section{Básicos de Rust}
+Esta es la sección importante donde se conocerán los conceptos de programación aplicados a Rust, como su sintaxis, declaración de variables y los elementos básicos que se ven en todo lenguaje.
+
+\subsection{Función Principal}
+Se debe conocer que Rust es un lenguaje de programación compilado y de tipado fuerte, por lo que
+se requiere una función principal. Si has trabajado con C o C++, sabrás que un programa no se va a ejecutar si su función \texttt{main} no está presente en el código. Lo mismo ocurre en Rust: si su función \texttt{main} no está en el código, este dará un error. Por lo tanto, un código sencillo en Rust sería el siguiente:
+
+\noindent
+
+
+	\begin{lstlisting}[style=ruststyle]
+fn main() {
+	println!("Hola, Mundo");
+}
+	\end{lstlisting}
+	\hyperlink{println}{\textbf{println!}} se usa para imprimir texto...
+
+
+
+	\subsection{Variables}
+	Al conocer una variable podriamos definirlo de una manera mas corta, como una caja que almacena un valor. Técnicamente, una variable es una posición en la memoria que almacena un valor con un tipo específico.
+
+	Las variables en rust por defecto son \hyperlink{inmutable}{\textbf{inmutable}} y estan deben estar antecesidas por la expresión \textbf{let} como se observa en el siguiente codigo:
+
+\begin{lstlisting}[style=ruststyle]
+let Variable = 10
+\end{lstlisting}
+
+	Si se desea que el valor de una variable pueda cambiar, es necesario marcarla como \hyperlink{mutable}{\textbf{mutable}} usando la palabra clave \hyperlink{mut}{ \textbf{mut}}:
+
+\begin{lstlisting}[style=ruststyle]
+let mut Variable = 10
+Variable = 20 // Su valor cambia
+\end{lstlisting}
+
+	Rust también permite declarar variables constantes. Si estás familiarizado con JavaScript, su comportamiento es similar a `const`. En Rust, se usa la palabra clave \hyperlink{const}{\textbf{const}}, y es obligatorio especificar el tipo de dato de la constante:
+
+\begin{lstlisting}[style=ruststyle]
+const HOURS_IN_MINUTES: u32 = 60
+\end{lstlisting}
+
+	Por convención, las declaraciones de variables constantes siga el estilo \textbf{SCREAMING\_SNAKE\_CASE} ya que es una norma entre los desarrolladores de este lenguaje
+
+
+	%SHADOWING
+
+	\subsection{Sombras (Shadowing)}
+
+	Las variables inmutables pueden tener un nuevo valor, pero esto no significa que se les asigne un nuevo valor directamente. En su lugar, se crea una nueva variable con el mismo nombre, lo que hace sombra (shadowing) a la anterior. Este comportamiento se muestra en el siguiente código:
+
+\begin{lstlisting}[style=ruststyle]
+	let x = 40;
+	let x = x + 30; // X = 70
+	let x = 40;
+	x = x + 30; //! ESTA FORMA NO SE PUEDE
+\end{lstlisting}
+
+	\newpage
+\section{Tipos de datos basicos}
+	\subsection{Tipos de enteros}
+Es importante mencionar que Rust maneja dos tipos de enteros, y su uso depende del contexto en el que se desarrolle el software. Estos son: enteros con \textbf{signo} y enteros \textbf{sin signo}.
+
+Para comprender la diferencia, ten en cuenta que los enteros con signo permiten representar valores negativos, mientras que los enteros sin signo solo representan valores positivos (incluyendo el cero). Su declaración se realiza de la siguiente manera:
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\hline
+		Tamaño Bytes & Con signo & Sin signo \\
+		\hline
+		8 & \textbf{i}8 & \textbf{u}8 \\
+		\hline
+		16 & \textbf{i}16 & \textbf{u}16 \\
+		\hline
+		32 & \textbf{i}32 & \textbf{u}32 \\
+		\hline
+		64 & \textbf{i}64 & \textbf{u}64 \\
+		\hline
+		128 & \textbf{i}128 & \textbf{u}128 \\
+		\hline
+		128 & \textbf{i}128 & \textbf{u}128 \\
+		\hline
+		arch &  \textbf{i}size & \textbf{u}size \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\paragraph{¿Qué son \texttt{isize} y \texttt{usize}?}
+
+Estos dos tipos están directamente relacionados con la arquitectura del sistema en el que se ejecuta el programa:
+
+\begin{itemize}
+	\item \texttt{isize} es un entero con signo cuyo tamaño depende del sistema (generalmente 4 bytes en sistemas de 32 bits y 8 bytes en sistemas de 64 bits).
+	\item \texttt{usize} es su contraparte sin signo.
+\end{itemize}
+
+Estos tipos se utilizan comúnmente para operaciones relacionadas con índices, tamaños de colecciones y punteros. Por ejemplo, funciones que devuelven la cantidad de elementos en un vector, como \texttt{vec.len()}, devuelven un valor de tipo \texttt{usize}.
+
+\begin{quote}
+	Usar \texttt{usize} e \texttt{isize} garantiza portabilidad del código entre arquitecturas de 32 y 64 bits.
+\end{quote}
+
+
+	\subsubsection{Literares de enteros}
+	 Literal entero representa un valor numérico directamente escrito en el código fuente. La forma en que se escribe dicho literal determina su base numérica (decimal, hexadecimal, octal o binaria) y, si se desea, también su tipo de dato mediante un sufijo.
+
+
+\begin{lstlisting}[style=ruststyle]
+let decimal = 98;          // Literal decimal (base 10)
+let hexadecimal = 0xff;    // Literal hexadecimal (base 16), equivale a 255
+let octal = 0o77;          // Literal octal (base 8), equivale a 63
+let binario = 0b1111_0000; // Literal binario (base 2), equivale a 240
+let byte = b'A'; // Literal byte (u8), valor ASCII del caracter 'A' -> 65
+\end{lstlisting}
+
+	Ademas se pueden usar \textbf{\_} para mejor la escritura de algunos enteros como podria
+	ser digital un millon de hacerlo como \textit{1000000} a \textit{1\_000\_000}
+
+	%SECCION FLOTANTES
+	\subsection{Flotantes (Floats)}
+	Los números flotantes representan valores numéricos con parte decimal y permiten realizar cálculos más precisos en operaciones fraccionarias. En Rust, se interpretan como de doble precisión por defecto (f64).
+
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|}
+			\hline
+			Tipo & Estado \\
+			\hline
+			f32 & Precisión simple \\
+			\hline
+			f64 & Precisión doble \\
+			\hline
+			\end{tabular}
+	\end{table}
+	%SECCION BOLEAN
+	\subsection{Bool}
+	Los valores booleanos representan estados lógicos, siendo únicamente dos los posibles: true (verdadero) y false (falso). Es comúnmente utilizado en expresiones condicionales y estructuras de control como if, while o match.
+\begin{lstlisting}[style=ruststyle]
+let estado: bool = true;
+\end{lstlisting}
+	\subsection{Caracter (char)}
+El tipo de dato char representa un único carácter Unicode. A diferencia de otros lenguajes donde los caracteres suelen ocupar 1 byte, en Rust un char ocupa 4 bytes, ya que puede almacenar cualquier símbolo Unicode. Los caracteres se escriben entre comillas simples ('), y su tipo explícito es char.
+\begin{lstlisting}[style=ruststyle]
+let letra: char = 'a';
+let simbolo: char = '\u{03A9}';
+\end{lstlisting}
+
+	\section{Funciones}
+	Son elementos fundamentales presentes en la mayoría del código, ya que las funciones representan secciones de proceso que serán llamadas para ejecutarse. Como se mencionó anteriormente, Rust requiere la función \textbf{main()}, ya que esta es el punto de entrada del programa. Para definir una función en Rust, se utiliza la siguiente estructura:
+
+\begin{lstlisting}[style=ruststyle]
+fn nombre_funcion() {
+	// PROCESO
+}
+\end{lstlisting}
+
+	Sin embargo, las funciones también pueden requerir \textbf{\textit{parámetros \textbackslash argumentos}} para realizar una acción específica.
+	Es importante indicar el tipo de dato de cada parámetro al momento de declararlos. Además, si la función va a retornar un valor, también se debe especificar el tipo de dato que será devuelto.
+
+\begin{lstlisting}[style=ruststyle]
+// El -> indica el tipo de dato que va a retornar la funcion
+fn funcion(x: i32) -> i32 {
+	// PROCESO
+	return x;
+}
+\end{lstlisting}
+
+	\section{Expresiones}
+	Son bloques de código que retornan un valor. Es importante aclarar que esto no corresponde a una \textbf{función} como tal, por lo que no debe confundirse con una función lambda (Python) o una arrow function (JavaScript). Una expresión es simplemente una sección dentro de un bloque que devuelve un resultado. Para que ese valor sea devuelto correctamente, no se debe colocar punto y coma (;) al final de la expresión.
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let x: i32 = 10;
+
+	// SECCION DE EXPRESION
+	let y: i32 = {
+		let x = 40; // Esta variable es distinta a la variable externa
+		x + 20      // Valor devuelto por la expresion (sin punto y coma)
+	};
+
+	println!("Valor de Y: {}", y); // Va a imprimir 60
+}
+\end{lstlisting}
+
+
+
+
+\section{Condicionales}
+
+Se les llama condicionales a las estructuras de código donde, a partir de una condición que puede ser verdadera o falsa, se ejecuta una acción u otra. Las expresiones evaluadas en estas condiciones deben ser de tipo booleano.
+
+A diferencia de otros lenguajes como JavaScript o Python, Rust no maneja valores \textit{truthy} o \textit{falsy}; es decir, no permite usar cadenas, números u otros tipos como condiciones implícitas. En Rust, solo se pueden usar expresiones que evalúan explícitamente a un valor booleano (`true` o `false`).
+
+La estructura condicional comienza con la palabra clave \texttt{if}, seguida opcionalmente por \texttt{else} y, en caso de múltiples condiciones, se puede usar \texttt{else if}.
+\linebreak
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let number: i32 = 10;
+
+	if number % 2 == 0 {
+		println!("Divisible entre 2");
+	} else if number % 3 == 0 {
+		println!("Divisible entre 3");
+	} else {
+		println!("No es divisible ni entre 2 ni entre 3");
+	}
+}
+\end{lstlisting}
+
+
+Rust también permite realizar operaciones condicionales en línea utilizando el concepto de expresiones. Esto se asemeja a la operación ternaria en otros lenguajes de programación, aunque en Rust no existe un operador especial como `? :`; en su lugar, se usa directamente una estructura `if` como expresión.
+\newline\newline\newline
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let condicion: bool = true;
+	let numero: i32 = if condicion { 5 } else { 3 };
+	println!("El valor es: {}", numero);
+}
+\end{lstlisting}
+
+
+\begin{quote}
+	\textbf{Nota:} \textit{Comúnmente se explican primero las iteraciones antes que las estructuras de datos que existen en el lenguaje. Sin embargo, para simplificar y comprender mejor el uso de las iteraciones, primero se explicará el tema de las estructuras que ofrece Rust.}
+\end{quote}
+
+% SECCION TUPLA
+\section{Tuplas}
+Las tuplas son una colección de datos inmutable, en donde no se puede aumentar ni reducir su longitud una vez declaradas. Es importante resaltar que cada elemento presente en la tupla debe tener definido su tipo de dato:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let tup: (i32, f64, u8) = (-300, 5.4, 4);
+}
+\end{lstlisting}
+
+Además, las tuplas permiten hacer destructuración de elementos, es decir, se pueden asignar sus valores a distintas variables que hayan sido declaradas:\newpage
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let tup: (i32, f64, u8) = (-300, 5.4, 4);
+	let (entero, flotante, noSigno) = tup; // Las variables adoptaran su valor segun la posicion
+}
+\end{lstlisting}
+
+Si se desea acceder a un índice específico, se realiza de la siguiente manera:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let tup: (i32, f64, u8) = (-300, 5.4, 4);
+	println!("Ultimo indice: {}", tup.2);
+}
+\end{lstlisting}
+
+	%% ARREGLOS
+\section{Arreglos (Arrays)}
+Los arreglos son colecciones de datos con un tamaño fijo, en los que \textbf{todos los elementos deben ser del mismo tipo}. A diferencia de las tuplas, que permiten múltiples tipos de datos en sus elementos, los arreglos están restringidos a un único tipo.
+
+Es importante destacar que los arreglos en Rust \textbf{no se comportan como los arrays presentes en algunos lenguajes dinámicos} \textit{(como JavaScript o Python)}, ya que \textbf{no disponen de métodos para agregar o eliminar elementos}. Esta funcionalidad es propia de los vectores, que son estructuras dinámicas.\linebreak
+
+La sintaxis para declarar un arreglo en Rust es: \textit{`[tipo; cantidad] = [valores];`}. Los elementos se acceden mediante índices, comenzando desde el cero.
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let vocales: [char; 5] = ['a','e','i','o','u'];
+	println!("Ultima vocal es: {}", vocales[4]);
+}
+\end{lstlisting}
+
+Tambien es posible crear arreglos donde todos los elementos contienen un mismo valor repetido, especificando la cantidad de veces que dicho valor debe aparecer. Para ello, se utiliza la siguiente sintaxis:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let a = [5; 100]; // Creara un arreglo de 100 elementos, todos con el valor 5
+}
+\end{lstlisting}
+
+
+% SECCION BUCLES
+
+\section{Bucles}
+Los bucles son estructuras de control que permiten ejecutar un bloque de codigo de manera repetitiva. En Rust, existen tres formas principales de crear bucles, cada una adaptada a distintos tipos de necesidades. Un bucle repite su ejecucion mientras se cumpla una determinada condicion o hasta que se indique una interrupcion explicita. Esta repeticion es util para automatizar tareas, recorrer estructuras de datos, o realizar operaciones hasta alcanzar un criterio definido.
+
+\subsection{Bucle loop}
+El bucle \texttt{loop} permite crear un ciclo indefinido, es decir, un ciclo que se repite continuamente hasta que sea interrumpido manualmente. Este tipo de bucle es util cuando no se conoce de antemano cuantas veces se debe repetir el bloque de codigo. Para finalizar el bucle, se utiliza la expresion \texttt{break}, la cual, ademas de detener la ejecucion del ciclo, puede retornar un valor.
+
+\begin{lstlisting}[style=ruststyle]
+let mut contador: i32 = 0;
+let resultado = loop {
+	contador += 1;
+	if contador == 10 {
+	break contador; // Retorna el valor 10 y finaliza el bucle
+	}
+};
+println!("Final de ciclo: {}", resultado);
+\end{lstlisting}
+
+
+\subsection{Bucle while}
+El bucle \texttt{while} ejecuta un bloque de codigo mientras una condicion sea verdadera. Es una estructura muy util cuando no se sabe cuantas veces se debe repetir la ejecucion, pero se tiene una condicion que determina cuando debe finalizar.
+
+A diferencia del bucle \texttt{loop}, que requiere una instruccion \texttt{break} explicita para detenerse, el bucle \texttt{while} evalua una expresion booleana al inicio de cada iteracion. Si la condicion es verdadera, el bloque de codigo se ejecuta; de lo contrario, el bucle finaliza automaticamente. Esto permite una estructura mas clara y menos anidada para ciclos dependientes de condiciones.
+
+\begin{lstlisting}[style=ruststyle]
+	let mut numero = 3;
+while numero != 0 {
+	println!("{}!", numero);
+	numero -= 1;
+}
+println!("numero: {}", numeroz);
+\end{lstlisting}
+
+
+
+
+\subsection{Bucle for}
+
+El bucle \texttt{for} esta disenado principalmente para recorrer colecciones de datos. Su ventaja radica en que puede asociar automaticamente la longitud de una estructura, lo cual evita errores por desbordamientos o iteraciones no deseadas. Esta caracteristica hace que el bucle \texttt{for} sea una opcion segura y eficiente al trabajar con arreglos, vectores u otras estructuras iterables.
+
+Su sintaxis es similar a la del lenguaje Python, permitiendo una forma concisa y clara de recorrer elementos:
+
+\begin{lstlisting}[style=ruststyle]
+let arr = [10, 20, 30, 40, 50];
+
+for element in arr {
+	println!("the value is: {}", element);
+}
+\end{lstlisting}
+
+\subsection{Iterando con Rangos}
+
+Una de las fortalezas del bucle \texttt{for} en Rust es su capacidad de iterar facilmente a traves de rangos. Esto hace que sea una de las estructuras de bucle mas utilizadas, ya que permite recorrer secuencias de numeros sin necesidad de especificar manualmente una condicion de parada o un incremento.
+
+Rust proporciona el tipo \texttt{Range}, que permite generar numeros desde un valor inicial hasta otro valor final, excluyendolo. Por ejemplo, el rango \texttt{1..4} generara los valores 1, 2 y 3.
+
+Tambien es posible invertir el orden de un rango utilizando el metodo \texttt{rev()}, lo cual puede ser util, por ejemplo, en conteos regresivos.
+
+\begin{lstlisting}[style=ruststyle]
+for number in 1..5 { //  .. excluye el numero
+	println!("{}", number);
+}
+
+for number in 1..=5 { // = incluye el numero
+	println!("{}", number);
+}
+
+for number in (1..4).rev() { // Invierte la secuencia
+	println!("{}!", number);
+}
+\end{lstlisting}
+
+Este tipo de sintaxis permite mayor legibilidad y evita errores comunes en los bucles manuales. En lugar de depender de una variable de control y una condicion, simplemente se define el rango que se desea recorrer y Rust se encarga del resto.
+
+\section{Ownership}
+
+El \textit{ownership}, o manejo de propiedad, es una de las caracteristicas principales que distinguen a Rust. Este concepto redefine la forma en que se gestiona la memoria en los programas, adoptando un paradigma diferente al de los lenguajes con recolector de basura (\textit{Garbage Collector}, GC), asi como al de los lenguajes que exigen una gestion manual de la memoria.
+
+Rust propone un enfoque intermedio. Su modelo de memoria combina las ventajas de ambos estilos sin incurrir en sus inconvenientes. Este modelo se denomina \textbf{ownership}, y permite a Rust garantizar seguridad en el manejo de memoria sin necesidad de un recolector de basura.
+
+Para comprender adecuadamente el \textit{ownership}, primero es necesario conocer los conceptos de \textbf{la pila (\textit{stack})} y \textbf{el monton (\textit{heap}).}
+
+\subsection{Pila (Stack)}
+
+El concepto de pila hace referencia a una estructura de memoria que organiza los valores segun el orden en que son creados, eliminandolos en orden inverso. Es decir, el ultimo valor que entra es el primero en salir (LIFO: \textit{Last In, First Out}).
+
+Una forma intuitiva de entenderlo es pensar en el proceso de desarmar un computador: las primeras piezas que se desacoplan seran las ultimas en volver a colocarse, mientras que las ultimas piezas en salir seran las primeras en ensamblarse nuevamente.
+
+En el contexto de un programa, la pila almacena informacion de manera ordenada segun la ejecucion. Por ejemplo, si antes de una sentencia \texttt{while} se declararon algunas variables, y dentro del \texttt{while} se crean otras, las variables internas del bucle seran eliminadas primero al terminar su ambito, mientras que las anteriores se mantendran hasta que finalicen sus respectivos ambitos. Esto refleja como Rust gestiona automaticamente la memoria en la pila.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{/home/arekkasu/Documents/L4TEX/satack.png}
+	\caption{Representacion visual del comportamiento LIFO en la pila.}
+\end{figure}
+
+La ilustracion muestra el funcionamiento interno de la pila. Se observa como un valor hexadecimal (en este caso, \texttt{0xB2}) entra a la estructura y se ubica encima del valor previamente almacenado (\texttt{0xFF}). Cuando se realiza una operacion de salida, el ultimo valor en entrar es el primero en salir, manteniendose asi la logica LIFO que caracteriza al stack.
+
+
+\subsection{Monton (Heap)}
+
+El monton, o \textit{heap}, es un espacio de memoria que se usa cuando el tamaño de los datos no es conocido durante la ejecucion del programa. En lugar de asignar una posicion fija como ocurre con la pila, el heap reserva un bloque de memoria y devuelve un puntero para su manipulacion.
+
+Este puntero queda almacenado en la pila y es el que se usa para acceder al dato que se encuentra en el monton. Este tipo de gestion es comun cuando se trabaja con colecciones u otras estructuras que requieren memoria flexible.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{/home/arekkasu/Documents/ArekVault/Rust Learning/DRAWS/Heap2.png}
+	\caption{Representacion visual del comportamiento LIFO en la pila.}
+\end{figure}
+
+\subsection{Tipo String}
+
+El tipo \texttt{String} representa una secuencia de caracteres, presente en casi todos los lenguajes de programacion, aunque cada lenguaje lo implementa de forma diferente. En Rust, el tipo \texttt{String} se almacena en el monton (\textit{heap}), ya que su tamaño puede cambiar durante la ejecucion, lo que lo hace una estructura dinamica. Como se explico anteriormente, los datos en el heap son accedidos a traves de punteros que se almacenan en la pila (\textit{stack}), por lo tanto, el \texttt{String} se comporta de esa manera.
+
+A continuacion se muestra un ejemplo de como se declara un \texttt{String} tanto en estado inmutable como mutable:
+
+\begin{lstlisting}[style=ruststyle]
+let cadena = String::from("cadena"); // Estado inmutable
+let mut saludo = String::from("Hola"); // Estado mutable
+saludo.push_str(" Mundo"); // push_str concatena strings
+\end{lstlisting}
+
+El uso de \texttt{::} hace referencia a una funcion asociada al tipo \texttt{String}, en este caso, \texttt{from}, que permite crear una nueva cadena a partir de una literal.
+
+El comportamiento de la memoria tambien se evidencia cuando un \texttt{String} sale de su ambito. En el siguiente ejemplo, se observa como Rust elimina el dato del heap automaticamente al salir del bloque donde fue declarado:
+
+\begin{lstlisting}[style=ruststyle]
+{
+	let cadena = String::from("cadena");
+} // Aqui termina el ambito de cadena
+
+println!("{}", cadena); // Error: cadena ya no es valida
+\end{lstlisting}
+
+Este tipo de control es una caracteristica central del modelo de propiedad de Rust, que garantiza una gestion segura de la memoria sin necesidad de recolectores de basura.
+
+\subsection{Transferencia de propiedad}
+
+Como se ha explicado anteriormente, en Rust una variable puede dejar de existir simplemente por haber salido de su ámbito. Sin embargo, existen otros casos donde también se pierde el control sobre un valor: uno de ellos ocurre al asignar una variable a otra.
+
+Cuando se trata de tipos primitivos (como enteros), la asignación copia el valor a una nueva dirección de memoria. Esto significa que ambas variables existen de forma independiente:
+
+\begin{lstlisting}[style=ruststyle]
+let x: i32 = 50;
+let y: i32 = x;
+\end{lstlisting}
+
+En este ejemplo, `y` obtiene una copia del valor de `x`. Ambas ocupan espacios distintos en el stack, por lo que `x` continúa siendo válida y puede usarse sin problema.
+
+Por el contrario, si el valor asignado es un tipo complejo, como un `String`, se produce una \textbf{transferencia de propiedad}. Es decir, el valor de `saludo` se mueve a `saludo2`, y a partir de ese momento, `saludo` deja de ser válido. Cualquier intento de usarla generará un error en tiempo de compilación:
+
+\begin{lstlisting}[style=ruststyle]
+let saludo = String::from("Hola Mundo");
+let saludo2 = saludo;
+println!("{}, {}", saludo, saludo2); // Error: uso de valor movido
+\end{lstlisting}
+
+Rust aplica esta lógica para evitar que múltiples variables apunten simultáneamente a la misma región de memoria en el heap. Al mover la propiedad, solo una variable tiene acceso al dato, lo cual permite una gestión segura de la memoria sin necesidad de un recolector de basura.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{/home/arekkasu/Documents/ArekVault/Rust Learning/DRAWS/SI.png}
+	\caption{`saludo` pasa a ser invalidada tras la asignación a `saludo2`, y solo `saludo2` mantiene el acceso al heap.}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{/home/arekkasu/Documents/ArekVault/Rust Learning/DRAWS/NO.png}
+	\caption{Interpretación incorrecta: ambas variables parecen tener acceso al mismo dato, pero en Rust esto no es permitido.}
+\end{figure}
+
+\subsection{Clone y Copy}
+
+En la sección anterior se mostró que asignar una variable que apunta al heap no crea una copia real del valor, sino que transfiere la propiedad. Por ello, si se desea conservar el valor original y duplicarlo, se debe utilizar el método \textbf{\textit{clone}}.
+
+Este método crea una copia profunda del dato, es decir, se reserva un nuevo espacio en el heap y se copia el contenido. Sin embargo, este proceso tiene un mayor costo computacional.
+
+\begin{lstlisting}[style=ruststyle]
+let saludo = String::from("Hola Mundo");
+let saludo2 = saludo.clone(); // Se crea un nuevo valor en memoria
+println!("{}, {}", saludo, saludo2); // Ya no genera error
+\end{lstlisting}
+
+\textbf{¿Dónde se aplica \textit{Copy}?}
+
+La característica \texttt{Copy} se aplica exclusivamente a tipos de datos que se almacenan completamente en la pila (\textit{stack}). Estos valores se copian de forma automática al ser asignados a otra variable, sin necesidad de usar métodos adicionales como \texttt{clone}.
+
+\begin{itemize}
+	\item Todos los tipos de enteros, como \texttt{u32}.
+	\item El tipo booleano, \texttt{bool}, con valores \texttt{true} y \texttt{false}.
+	\item Todos los tipos de punto flotante, como \texttt{f64}.
+	\item El tipo de caracter, \texttt{char}.
+	\item Tuplas, si todos sus elementos también implementan \texttt{Copy}. Por ejemplo, \texttt{(i32, i32)} lo implementa, pero \texttt{(i32, String)} no.
+\end{itemize}
+
+A continuación se muestra un ejemplo de tipo que implementa \texttt{Copy}:
+
+\begin{lstlisting}[style=ruststyle]
+let x: i32 = 50;
+let y: i32 = x; // y es independiente de x.
+\end{lstlisting}
+
+
+\subsection{Propiedad y Funciones}
+
+A lo largo del capítulo se ha mencionado cómo funciona el alcance (\textit{scope}) de una variable, principalmente dentro de la función \texttt{main}. Sin embargo, ¿qué sucede cuando las variables se pasan a otras funciones?
+
+Rust aplica el mismo modelo de propiedad incluso cuando una variable se mueve entre funciones. Es decir, si una variable es pasada como argumento a otra función, esta nueva función toma posesión del valor, y la variable original dejará de ser válida en su contexto anterior.
+
+Supongamos que existe una función que simplemente imprime una cadena:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let s = String::from("Hola");
+	imprimir_variable(s);
+}
+\end{lstlisting}
+
+En este ejemplo, la variable \texttt{s} se declara en \texttt{main}, pero al ser pasada como argumento a \texttt{imprimir\_variable}, su propiedad se transfiere a dicha función. Veamos cómo luce:
+
+\begin{lstlisting}[style=ruststyle]
+fn imprimir_variable(s: String) {
+	print!("{}", s);
+}
+\end{lstlisting}
+
+Cuando esto ocurre, \texttt{main} pierde el acceso a \texttt{s}, ya que su propiedad ha sido movida. En otras palabras, \texttt{s} deja de existir en \texttt{main} inmediatamente después de la llamada, y solo puede usarse dentro de \texttt{imprimir\_variable} hasta que esta finalice.
+
+Este comportamiento es parte del sistema de propiedad de Rust y garantiza la seguridad en el manejo de memoria sin necesidad de un recolector de basura.
+
+Pero, ¿qué ocurre si la función devuelve el valor recibido como argumento? En ese caso, la propiedad puede ser transferida de vuelta al contexto original. Ajustemos el código de la siguiente manera:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let s = String::from("Hola");
+	let s2 = imprimir_variable(s);
+	imprimir_variable(s); // Error: s ya no es valido
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=ruststyle]
+fn imprimir_variable(s: String) -> String {
+	print!("{}", s);
+	s // Retornando el valor
+}
+\end{lstlisting}
+
+En este nuevo ejemplo, el valor de \texttt{s} es transferido a \texttt{imprimir\_variable}, y luego retornado para ser almacenado en \texttt{s2}. Por lo tanto, \texttt{s} ya no existe como tal, y su uso posterior causará un error, pues la propiedad ha sido movida.
+
+Este patrón es común en Rust y tiene solución a través del uso de referencias y préstamos (\textit{borrowing}), lo cual será abordado más adelante.
+
+\subsection{Referencias y Préstamos}
+
+En capítulos anteriores se explicó cómo Rust gestiona la memoria usando las regiones de \textit{stack} y \textit{heap}, y cómo los valores se eliminan según el alcance del programa. Sin embargo, ¿qué sucede si queremos conservar el acceso a un valor sin transferir su propiedad ni duplicarlo?
+
+Aquí entra en juego el concepto de \textbf{referencias} y \textbf{préstamos de propiedad}.
+
+Una \textbf{referencia} es un puntero seguro que apunta a un valor en memoria sin tomar su propiedad. En Rust, se representa utilizando el símbolo \textbf{\&} delante de una variable. Al crear una referencia, no se transfiere la propiedad del dato original; simplemente se accede a él de forma temporal.
+
+Por su parte, el \textbf{préstamo} ocurre en el momento en que se hace uso de dicha referencia. Es decir, cuando se pasa como argumento a una función o se asigna a otra variable para leer o modificar su contenido, sin convertirse en su dueño.
+
+Rust garantiza que estas referencias no provoquen errores de acceso a memoria gracias a su sistema de comprobación en tiempo de compilación.
+
+\begin{lstlisting}[style=ruststyle]
+let s1 = String::from("Hola");
+let len = length_string(&s1); // El simbolo & indica que se esta pasando una referencia
+
+fn length_string(s: &String) -> usize {
+	s.len() // Retorna la longitud de la cadena
+}
+\end{lstlisting}
+
+\subsubsection{Referencias mutables}
+
+Es importante destacar que también pueden existir referencias \textbf{mutables}, las cuales permiten modificar el valor referenciado. Para que esto sea posible, la variable original debe ser declarada como mutable; de lo contrario, Rust lanzará un error de compilación.
+
+\begin{lstlisting}[style=ruststyle]
+let mut s1 = String::from("Hola");
+add_string(&mut s1); // Se pasa una referencia mutable
+
+fn add_string(s: &mut String) {
+	s.push_str(" se modifico :D");
+}
+\end{lstlisting}
+
+Debe tenerse en cuenta que Rust no permite la coexistencia de una referencia mutable y una o más referencias inmutables al mismo valor dentro del mismo ámbito. Esto se hace para evitar condiciones de carrera y asegurar la consistencia en el acceso a la memoria.
+
+\begin{lstlisting}[style=ruststyle]
+let mut s = String::from("hello");
+
+let r1 = &s;
+let r2 = &s;
+let r3 = &mut s; // Error: no puede coexistir con r1 y r2
+println!("{}", r3);
+\end{lstlisting}
+
+Este código genera un error de compilación porque las referencias inmutables \texttt{r1} y \texttt{r2} aún están activas cuando se intenta crear la referencia mutable \texttt{r3}. Según las reglas de seguridad de Rust, los accesos concurrentes al mismo dato deben ser claramente definidos: múltiples accesos de solo lectura o un único acceso de escritura, pero nunca ambos al mismo tiempo.
+
+\subsection{Referencias colgantes}
+
+Es fundamental tener en cuenta que en Rust no se puede devolver una \textbf{referencia colgante}, es decir, una referencia a un valor que ha sido eliminado por haber salido de su ámbito.
+
+Este tipo de error ocurre, por ejemplo, cuando se intenta retornar una referencia a una variable local dentro de una función. Dado que la variable local deja de existir al finalizar la función, cualquier referencia a ella quedará apuntando a una zona de memoria inválida, lo cual Rust evita en tiempo de compilación.
+
+\begin{lstlisting}[style=ruststyle]
+fn referencia_colgante() -> &String {
+	let s = String::from("texto");
+	&s // Error: `s` no vive lo suficiente
+}
+\end{lstlisting}
+
+En este ejemplo, la variable \texttt{s} se crea dentro del ámbito de la función y se elimina al finalizar. Por lo tanto, devolver una referencia a \texttt{s} resultaría en una referencia inválida. Rust detecta este problema y lanza un error de compilación antes de que el programa se ejecute.
+
+
+\subsection{Tipo Slice}
+
+Los \textbf{slices}, o rebanadas, permiten obtener una porción de una colección, como una cadena de texto o un arreglo. Son útiles cuando se quiere trabajar con parte de una estructura sin copiar los datos.
+
+Por ejemplo, se puede extraer una sección específica de una cadena:
+
+\begin{lstlisting}[style=ruststyle]
+let texto = String::from("Hola mundo");
+let recorte = &texto[0..3]; // Recorte desde el indice 0 hasta el 2
+\end{lstlisting}
+
+En este caso, \texttt{recorte} hace referencia a los primeros tres bytes de \texttt{texto}. Esto se logra sin crear una nueva cadena, simplemente apuntando a una parte de la original.
+
+Una observación importante es que los literales de cadena, como \texttt{"Hola mundo"}, ya son slices por naturaleza. Específicamente, son de tipo \texttt{\&str}, una referencia inmutable a un segmento de texto en memoria.
+
+\begin{lstlisting}[style=ruststyle]
+let texto = "Hola mundo"; // Literal de tipo &str
+println!("{}", texto);
+\end{lstlisting}
+
+Este tipo de slices también puede utilizarse en funciones, como en el siguiente ejemplo tomado de la documentación oficial de Rust:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let mut s = String::from("hello world");
+	let word = first_word(&s);
+	println!("The first word is: {}", word);
+}
+
+fn first_word(s: &String) -> &str {
+	let bytes = s.as_bytes();
+	for (i, &item) in bytes.iter().enumerate() {
+		if item == b' ' {
+			return &s[0..i];
+		}
+	}
+	&s[..]
+}
+\end{lstlisting}
+
+En este código, la función \texttt{first\_word} devuelve un slice que contiene la primera palabra de la cadena. Aunque recibe una referencia a un \texttt{String}, también puede recibir directamente un slice, como se ve a continuación:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let my_string = String::from("hello world");
+
+	let word = first_word(&my_string[..]); // Se pasa un slice explicito
+
+	let my_string_literal = "hello world";
+
+	let word = first_word(&my_string_literal[..]); // Tambien valido
+	let word = first_word(my_string_literal); // Incluso sin el slice
+}
+
+fn first_word(s: &str) -> &str {
+	let bytes = s.as_bytes();
+	for (i, &item) in bytes.iter().enumerate() {
+		if item == b' ' {
+			return &s[0..i];
+		}
+	}
+	&s[..]
+}
+\end{lstlisting}
+
+Como se observa, la función puede aceptar tanto un \texttt{String} como un literal de cadena porque ambos pueden representarse como un \texttt{\&str}. Además, no se incurre en errores de referencias colgantes, ya que el slice devuelto sigue siendo válido mientras la cadena original exista.
+
+Los slices también se pueden usar en estructuras de datos como arreglos:
+
+\begin{lstlisting}[style=ruststyle]
+fn main() {
+	let array = [1, 2, 3, 4];
+	let slice = &array[0..2]; // Devuelve [1, 2]
+}
+\end{lstlisting}
+
+Esto muestra la versatilidad de los slices para acceder a partes de arreglos o cadenas sin necesidad de copiar los datos.
+
+\section{Structs, Métodos y Enums}
+
+Rust no implementa un modelo de programación orientado a objetos tradicional como lo hacen lenguajes como Java o Python. Sin embargo, ofrece herramientas similares a través del uso de estructuras (\texttt{structs}) y enumeraciones (\texttt{enums}), acercándose en este aspecto más al lenguaje C.
+
+\subsection{Structs}
+
+Si vienes de C, sabrás que allí se utilizan \texttt{structs} como una forma de agrupar distintos tipos de datos bajo una misma entidad, sin necesidad de un sistema completo de clases y herencia. Rust adopta este mismo concepto, aunque con sus propias reglas y mecanismos de seguridad.
+
+La sintaxis básica para definir un \texttt{struct} en Rust es sencilla, como se muestra a continuación:
+
+\begin{lstlisting}[style=ruststyle]
+struct User {
+	username: String,
+	email: String,
+}
+\end{lstlisting}
+
+Este tipo de declaración puede recordarte a la forma en que se definen objetos en lenguajes de tipado dinámico como JavaScript.
+
+Para crear una instancia de una estructura, se utiliza una sintaxis similar a la inicialización de objetos:
+
+\begin{lstlisting}[style=ruststyle]
+let user1 = User {
+	username: String::from("Arekkasu"),
+	email: String::from("Arekkasu@mail.me"),
+};
+println!("{}", user1.email);
+\end{lstlisting}
+
+Es importante aclarar que no se pueden modificar los campos de una instancia si esta no ha sido declarada como mutable. Además, en Rust no se permite marcar únicamente algunos campos como mutables; toda la instancia debe ser mutable:
+
+\begin{lstlisting}[style=ruststyle]
+let mut user1 = User {
+	username: String::from("Arekkasu"),
+	email: String::from("Arekkasu@mail.me"),
+};
+user1.email = String::from("nuevo@correo.com");
+\end{lstlisting}
+
+También se puede construir una estructura utilizando una función para encapsular la lógica de inicialización:
+
+\begin{lstlisting}[style=ruststyle]
+fn build_user(email: String, username: String) -> User {
+	User {
+		email,
+		username,
+		active: true,
+	}
+}
+
+let user1 = build_user("correo@correo.com".to_string(), "arekkasu".to_string());
+\end{lstlisting}
+
+Rust permite usar la sintaxis de propagación (`..`) para copiar campos desde una instancia existente:
+
+\begin{lstlisting}[style=ruststyle]
+let user2 = User {
+	email: String::from("correo@2.com"),
+	username: String::from("Arekkasu2"),
+	..user1 // copia los demas campos desde user1
+};
+\end{lstlisting}
+
+Otra característica interesante es que las estructuras también pueden tomar la forma de tuplas, como en el siguiente ejemplo:
+
+\begin{lstlisting}[style=ruststyle]
+struct RGB(i32, i32, i32); // Tupla estructurada llamada RGB
+struct Unit(); // Estructura unitaria sin campos
+
+let color = RGB(234, 234, 234);
+println!("{}, {}, {}", color.0, color.1, color.2);
+\end{lstlisting}
+
+
+	\newpage
+	% SECCION DE LAS FINALES
+	\section*{Funciones / Palabras clave}
+	\hypertarget{println}{\textbf{println!}}: Macro que imprime texto en consola, seguida de un salto de línea.
+
+
+	\hypertarget{inmutable}{\textbf{inmutable}}: Propiedad de una variable que no permite modificar su valor una vez asignado.
+
+
+	\hypertarget{mutable}{\textbf{mutable}}: Capacidad de una variable para cambiar su valor después de ser creada.
+
+	\hypertarget{let}{\textbf{let}}: Declaracion antecesora de una variable que demuestra que es una variable no constante.
+
+
+	\hypertarget{mut}{\textbf{mut}}: Expresion para declara una variable como mutable.
+
+
+	\hypertarget{const}{\textbf{const}}: Declaracion antecesora de una variable que declara una constante.
+\end{document}
