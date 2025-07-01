@@ -1,0 +1,5 @@
+*.tex linguist-documentation=true
+*.pdf linguist-documentation=true
+*.cls linguist-documentation=true
+*.sty linguist-documentation=true
+*.bib linguist-documentation=trues
