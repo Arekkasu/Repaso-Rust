@@ -745,7 +745,7 @@ fn main() {
 
 Esto muestra la versatilidad de los slices para acceder a partes de arreglos o cadenas sin necesidad de copiar los datos.
 
-\section{Structs, Métodos y Enums}
+\section{Structs, Métodos, Enums, Match}
 
 Rust no implementa un modelo de programación orientado a objetos tradicional como lo hacen lenguajes como Java o Python. Sin embargo, ofrece herramientas similares a través del uso de estructuras (\texttt{structs}) y enumeraciones (\texttt{enums}), acercándose en este aspecto más al lenguaje C.
 
@@ -753,7 +753,7 @@ Rust no implementa un modelo de programación orientado a objetos tradicional co
 
 Si vienes de C, sabrás que allí se utilizan \texttt{structs} como una forma de agrupar distintos tipos de datos bajo una misma entidad, sin necesidad de un sistema completo de clases y herencia. Rust adopta este mismo concepto, aunque con sus propias reglas y mecanismos de seguridad.
 
-La sintaxis básica para definir un \texttt{struct} en Rust es sencilla, como se muestra a continuación:
+La sintaxis básica para definir un \texttt{struct} en Rust es sencilla:
 
 \begin{lstlisting}[style=ruststyle]
 struct User {
@@ -762,9 +762,9 @@ struct User {
 }
 \end{lstlisting}
 
-Este tipo de declaración puede recordarte a la forma en que se definen objetos en lenguajes de tipado dinámico como JavaScript.
+Este tipo de declaración puede recordarte a cómo se definen objetos en lenguajes de tipado dinámico como JavaScript.
 
-Para crear una instancia de una estructura, se utiliza una sintaxis similar a la inicialización de objetos:
+Para crear una instancia de una estructura, se utiliza una sintaxis parecida a la inicialización de objetos:
 
 \begin{lstlisting}[style=ruststyle]
 let user1 = User {
@@ -791,20 +791,19 @@ fn build_user(email: String, username: String) -> User {
 	User {
 		email,
 		username,
-		active: true,
 	}
 }
-
+	
 let user1 = build_user("correo@correo.com".to_string(), "arekkasu".to_string());
 \end{lstlisting}
 
-Rust permite usar la sintaxis de propagación (`..`) para copiar campos desde una instancia existente:
+Rust permite usar la sintaxis de propagación (\texttt{..}) para copiar los campos restantes desde una instancia existente:
 
 \begin{lstlisting}[style=ruststyle]
 let user2 = User {
 	email: String::from("correo@2.com"),
 	username: String::from("Arekkasu2"),
-	..user1 // copia los demas campos desde user1
+	..user1 // Copia los demas campos desde user1
 };
 \end{lstlisting}
 
@@ -813,10 +812,256 @@ Otra característica interesante es que las estructuras también pueden tomar la
 \begin{lstlisting}[style=ruststyle]
 struct RGB(i32, i32, i32); // Tupla estructurada llamada RGB
 struct Unit(); // Estructura unitaria sin campos
-
+	
 let color = RGB(234, 234, 234);
 println!("{}, {}, {}", color.0, color.1, color.2);
 \end{lstlisting}
+
+Existe una forma de impresión de salida útil para depurar un struct: usar el atributo \texttt{Debug}. Para ello se debe derivar el rasgo (\textit{trait}) con la siguiente sintaxis:
+
+\begin{lstlisting}[style=ruststyle]
+#[derive(Debug)]
+struct Rectangle {
+	width: u32,
+	height: u32,
+}
+	
+fn main() {
+	let rect1 = Rectangle {
+		width: 30,
+		height: 50,
+	};
+		
+	println!("rect1 is {:?}", rect1);
+}
+\end{lstlisting}
+El tema de \textbf{Traits} será tratado más adelante.
+
+\subsubsection{Métodos en Structs}
+
+Para poder asignar métodos (funciones) a un struct, hay que utilizar la palabra clave \texttt{impl} junto con el nombre de la estructura.
+
+En Rust existen dos tipos de métodos:
+
+\begin{itemize}
+	\item \textbf{Funciones asociadas}: similares a métodos estáticos en otros lenguajes. No requieren una instancia para ser llamadas.
+	\item \textbf{Métodos con \texttt{\&self}}: requieren una instancia del struct y permiten acceder o manipular sus datos.
+\end{itemize}
+
+También es posible separar la definición de métodos en múltiples bloques \texttt{impl}, como se muestra a continuación:
+
+\begin{lstlisting}[style=ruststyle]
+struct Ejemplo {
+	// propiedades...
+}
+	
+impl Ejemplo {
+	// Funcion asociada
+	fn builder_ejemplo(...parametros) -> Ejemplo {
+		Ejemplo {
+			..parametros
+		}
+	}
+}
+	
+impl Ejemplo {
+	// Metodo que opera sobre una instancia
+	fn suma(&self, otros) -> usize {
+		// ...proceso
+	}
+}
+\end{lstlisting}
+
+\subsection{Enum}
+
+Los \texttt{enum} (abreviatura de enumerations) en Rust son una forma de representar un valor que puede ser exactamente uno entre varias variantes posibles. Esto es útil cuando una variable solo puede tomar un conjunto limitado de valores conocidos.
+
+La declaración de un \texttt{enum} se ve así:
+
+\begin{lstlisting}[style=ruststyle]
+enum Level {
+	Low,
+	Medium,
+	High,
+}
+\end{lstlisting}
+
+Y su uso se hace accediendo a una de sus variantes con el operador \texttt{::}:
+
+\begin{lstlisting}[style=ruststyle]
+let level_sound = Level::Low;
+\end{lstlisting}
+
+Los enums tambien pueden ser incorporados en un struct, supongamos un speaker Bluetooth y su nivel de volumen
+
+\begin{lstlisting}[style=ruststyle]
+enum Level {
+	Low,
+	Medium,
+	High,
+}
+
+struct Speaker {
+	name: String,
+	levelSpeaker: Level, 
+}
+
+let speaker = Speaker {
+	name: String::from("JBL"),
+	levelSpeaker: Level::HIGH,
+}
+\end{lstlisting}
+Otra característica poderosa de los \texttt{enum} en Rust es que sus variantes pueden contener datos. Cada variante puede almacenar distintos tipos o cantidades de información, lo cual permite representar estructuras de datos complejas de forma segura y expresiva.
+
+\begin{lstlisting}[style=ruststyle]
+enum Message {
+	Quit,                         // Sin datos
+	ChangeVolume(i32),           // Variante tipo tupla
+	Move { x: i32, y: i32 },     // Variante tipo estructura
+}
+\end{lstlisting}
+
+Esto permite que un solo tipo \texttt{enum} represente múltiples formas de datos relacionados bajo un mismo contexto. Por ejemplo, así se puede crear una instancia de una de las variantes:
+
+\begin{lstlisting}[style=ruststyle]
+let message = Message::ChangeVolume(50);
+\end{lstlisting}
+
+
+También se pueden implementar funciones asociadas para un \texttt{enum}, de forma muy similar a como se hace con una \texttt{struct}. Esto permite definir métodos que operen sobre las distintas variantes del enum:
+
+\begin{lstlisting}[style=ruststyle]
+impl Message {
+	fn GetVolume(&self){
+		// proceso
+	} 
+}
+\end{lstlisting}
+
+Rust proporciona un enum estándar llamado \texttt{Option<T>} que se utiliza para representar un valor que puede o no estar presente. Este tipo es fundamental en Rust, ya que sustituye el uso de valores nulos que existen en otros lenguajes, como \texttt{null} en JavaScript o \texttt{None} en Python, pero con una ventaja importante: está verificado en tiempo de compilación.
+
+La declaración simplificada del enum \texttt{Option<T>} es la siguiente:
+
+\begin{lstlisting}[style=ruststyle]
+enum Option<T> {
+	Some(T),
+	None,
+}
+\end{lstlisting}
+
+\textbf{¿Qué significa esto?}
+
+\texttt{Some(T)} representa el caso en que sí hay un valor del tipo \texttt{T}. \texttt{None} representa la ausencia de un valor. Este enum permite a Rust forzar a que el programador maneje correctamente los posibles casos donde un valor puede o no estar presente, evitando errores en tiempo de ejecución por referencias nulas.
+
+\textbf{Ejemplo básico:}
+
+\begin{lstlisting}[style=ruststyle]
+let numero = Some(5); // Option<i32>
+let texto = Some("Hola"); // Option<&str>
+	
+let vacio: Option<i32> = None;
+\end{lstlisting}
+
+En este ejemplo: \texttt{Some(5)} y \texttt{Some("Hola")} indican que existe un valor. \texttt{None} indica que no hay valor alguno, pero el tipo debe estar explícito para que Rust sepa de qué se trata (\texttt{Option<i32>} en este caso).
+
+\textbf{Manejo de valores:}
+
+Dado que \texttt{Option<T>} no es directamente compatible con valores del tipo \texttt{T}, es necesario "extraer" el valor de \texttt{Some} para poder usarlo:
+
+\begin{lstlisting}[style=ruststyle]
+let numero: Option<i32> = Some(5);
+	
+if let Some(valor) = numero {
+	println!("El valor es: {}", valor);
+} else {
+	println!("No hay valor");
+}
+\end{lstlisting}
+
+Este patrón permite trabajar con los valores de forma segura, obligando a manejar explícitamente los casos en que el valor podría no estar presente.
+
+
+\subsection{match}
+
+La expresión \texttt{match} en Rust es una de las herramientas más poderosas y versátiles para tomar decisiones según un valor. Básicamente permite evaluar un valor y ejecutar código dependiendo de qué patrón coincida con él.
+
+Rust obliga a que todos los posibles casos sean cubiertos, lo cual lo hace más seguro que otros lenguajes donde podrías olvidar un caso sin darte cuenta.
+
+Vamos a ver un ejemplo con \texttt{Option}, que es un tipo muy común cuando se trabaja con valores que pueden o no estar presentes:
+
+\begin{lstlisting}[style=ruststyle]
+let numero = Some(5);
+	
+match numero {
+	Some(5) => println!("El numero es cinco"),
+	Some(3) => println!("Es un tres."),
+	Some(_) => println!("Es otro numero."),
+	None => println!("No hay numero."),
+}
+\end{lstlisting}
+
+En este ejemplo se está evaluando el contenido de \texttt{numero}, que es un \texttt{Option<i32>}. Si es \texttt{Some(5)}, se imprime un mensaje. Si es \texttt{Some(3)}, otro. Y si es \texttt{Some} de cualquier otro número, usamos el comodín \texttt{\_} dentro del patrón para capturarlo sin importar cuál sea.
+
+Finalmente, \texttt{None} se maneja como un caso aparte. Y como puedes ver, cada bloque va acompañado de una acción.
+
+Esto hace que \texttt{match} sea muy útil cuando quieres tomar decisiones claras según múltiples posibilidades, y el compilador te asegura que no te estás olvidando de ningún caso.
+
+\subsubsection{Patrón general: \texttt{\_}}
+
+En ocasiones puede que no queramos escribir cada uno de los casos posibles en un \texttt{match}, ya sea porque son muchos, o simplemente porque nos interesa actuar solamente en ciertos casos concretos.
+
+Para esto, Rust nos permite usar el símbolo \texttt{\_} como un "capturador general", es decir, cualquier valor que no haya coincidido con los patrones anteriores, va a coincidir con \texttt{\_}.
+
+Veamos un ejemplo con un número cualquiera:
+
+\begin{lstlisting}[style=ruststyle]
+let dado = 6;
+	
+match dado {
+	1 => println!("Sacaste un uno"),
+	6 => println!("Wow, un seis"),
+	_ => println!("Sacaste algo entre 2 y 5."),
+}
+\end{lstlisting}
+
+Aquí estamos diciendo que si el valor es 1 o 6, hacemos algo específico, pero en cualquier otro caso no nos importa cuál número exacto sea, simplemente ejecutamos el código por defecto.
+
+Este patrón es muy útil cuando solo nos interesan ciertos valores y los demás no requieren lógica especial.
+
+Además, ayuda a cumplir con la regla de exhaustividad de \texttt{match}, ya que \texttt{\_} asegura que cualquier otro caso no listado también será cubierto.
+
+\subsubsection{\texttt{if let}}
+
+Hay situaciones en las que solo nos interesa saber si un valor coincide con una variante específica de un enum, por ejemplo con \texttt{Option}, pero no queremos escribir todo un bloque \texttt{match} solo para un caso. Para esto existe \texttt{if let}.
+
+La idea de \texttt{if let} es combinar un \texttt{if} con un patrón, como si dijéramos: "Si esto coincide, entonces haz algo". Así podemos escribir de forma más concisa y legible.
+
+Supongamos que queremos hacer algo solo si un número está contenido en un \texttt{Option<i32>} y es igual a 3:
+
+\begin{lstlisting}[style=ruststyle]
+let numero = Some(3);
+if let Some(3) = numero {
+	println!("El numero es tres");
+}
+\end{lstlisting}
+
+Este código hace lo mismo que un \texttt{match}, pero sin tener que escribir el caso genérico \texttt{\_} al final.
+
+También se puede usar junto con un bloque \texttt{else}, si queremos manejar lo que pasa cuando no se cumple el patrón:
+
+\begin{lstlisting}[style=ruststyle]
+let numero = Some(5);
+
+if let Some(3) = numero {
+	println!("Es tres");
+} else {
+	println!("No es tres");
+}
+\end{lstlisting}
+
+Es importante tener en cuenta que con \texttt{if let} solo estamos preguntando por un patrón específico. Si necesitamos manejar múltiples casos o queremos asegurarnos de cubrir todas las posibilidades, sigue siendo mejor usar un \texttt{match}.
+
+\texttt{if let} es útil cuando quieres código más limpio, pero recuerda: sacrificas exhaustividad a cambio de concisión.
 
 
 	\newpage
